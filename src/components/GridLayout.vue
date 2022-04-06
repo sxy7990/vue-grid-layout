@@ -22,7 +22,6 @@
 
     import {bottom, compact, getLayoutItem, moveElement, validateLayout, cloneLayout, getAllCollisions} from '@/helpers/utils';
     import {getBreakpointFromWidth, getColsFromBreakpoint, findOrGenerateResponsiveLayout} from "@/helpers/responsiveUtils";
-    //var eventBus = require('./eventBus');
 
     import GridItem from './GridItem.vue'
     import {addWindowEventListener, removeWindowEventListener} from "@/helpers/DOM";
@@ -69,10 +68,6 @@
             isResizable: {
                 type: Boolean,
                 default: true
-            },
-            isMirrored: {
-                type: Boolean,
-                default: false
             },
             useCssTransforms: {
                 type: Boolean,
@@ -174,7 +169,6 @@
 
                     self.initResponsiveFeatures();
 
-                    //self.width = self.$el.offsetWidth;
                     addWindowEventListener('resize', self.onWindowResize);
 
                     compact(self.layout, self.verticalCompact);
@@ -199,7 +193,6 @@
             width: function (newval, oldval) {
                 const self = this;
                 this.$nextTick(function () {
-                    //this.$broadcast("updateWidth", this.width);
                     this.eventBus.$emit("updateWidth", this.width);
                     if (oldval === null) {
                         /*
@@ -262,11 +255,9 @@
             layoutUpdate() {
                 if (this.layout !== undefined && this.originalLayout !== null) {
                     if (this.layout.length !== this.originalLayout.length) {
-                        // console.log("### LAYOUT UPDATE!", this.layout.length, this.originalLayout.length);
 
                         let diff = this.findDifference(this.layout, this.originalLayout);
                         if (diff.length > 0){
-                            // console.log(diff);
                             if (this.layout.length > this.originalLayout.length) {
                                 this.originalLayout = this.originalLayout.concat(diff);
                             } else {
@@ -302,13 +293,10 @@
             },
             containerHeight: function () {
                 if (!this.autoSize) return;
-                // console.log("bottom: " + bottom(this.layout))
-                // console.log("rowHeight + margins: " + (this.rowHeight + this.margin[1]) + this.margin[1])
-                const containerHeight =  bottom(this.layout) * (this.rowHeight + this.margin[1]) + this.margin[1] + 'px';
+                const containerHeight = bottom(this.layout) * (this.rowHeight + this.margin[1]) + this.margin[1] + 'px';
                 return containerHeight;
             },
             dragEvent: function (eventName, id, x, y, h, w) {
-                //console.log(eventName + " id=" + id + ", x=" + x + ", y=" + y);
                 let l = getLayoutItem(this.layout, id);
                 //GetLayoutItem sometimes returns null object
                 if (l === undefined || l === null){
@@ -324,7 +312,6 @@
                     this.$nextTick(function() {
                         this.isDragging = true;
                     });
-                    //this.$broadcast("updateWidth", this.width);
                     this.eventBus.$emit("updateWidth", this.width);
                 } else {
                     this.$nextTick(function() {
@@ -384,7 +371,6 @@
                     this.$nextTick(function() {
                         this.isDragging = true;
                     });
-                    //this.$broadcast("updateWidth", this.width);
                     this.eventBus.$emit("updateWidth", this.width);
 
                 } else {

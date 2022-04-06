@@ -1,7 +1,6 @@
 <template>
     <div id="app">
         <h1 style="text-align: center">Vue Grid Layout</h1>
-        <!--<pre>{{ layout | json }}</pre>-->
         <div>
             <div class="layoutJSON">
                 Displayed as <code>[x, y, w, h]</code>:
@@ -11,25 +10,14 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="layoutJSON">
-                Displayed as <code>[x, y, w, h]</code>:
-                <div class="columns">
-                    <div class="layoutItem" v-for="item in layout2">
-                        <b>{{item.i}}</b>: [{{item.x}}, {{item.y}}, {{item.w}}, {{item.h}}]
-                    </div>
-                </div>
-            </div>-->
         </div>
         <div id="content">
             <button @click="decreaseWidth">Decrease Width</button>
             <button @click="increaseWidth">Increase Width</button>
             <button @click="addItem">Add an item</button>
             <button @click="addItemDynamically">Add an item dynamically</button>
-            <!-- Add to show rtl support -->
-            <button @click="changeDirection">Change Direction</button>
             <input type="checkbox" v-model="draggable"/> Draggable
             <input type="checkbox" v-model="resizable"/> Resizable
-            <input type="checkbox" v-model="mirrored"/> Mirrored
             <input type="checkbox" v-model="responsive"/> Responsive
             <input type="checkbox" v-model="preventCollision"/> Prevent Collision
             <div style="margin-top: 10px;margin-bottom: 10px;">
@@ -43,7 +31,6 @@
                     :row-height="rowHeight"
                     :is-draggable="draggable"
                     :is-resizable="resizable"
-                    :is-mirrored="mirrored"
                     :prevent-collision="preventCollision"
                     :vertical-compact="compact"
                     :use-css-transforms="true"
@@ -75,35 +62,10 @@
                            @container-resized="containerResized"
                            @moved="moved"
                 >
-                    <!--<custom-drag-element :text="item.i"></custom-drag-element>-->
                     <test-element :text="item.i" @removeItem="removeItem($event)"></test-element>
-                    <!--<button @click="clicked">CLICK ME!</button>-->
                 </grid-item>
             </grid-layout>
             <hr/>
-            <!--<grid-layout
-                    :layout="layout2"
-                    :col-num="12"
-                    :row-height="rowHeight"
-                    :is-draggable="draggable"
-                    :is-resizable="resizable"
-                    :vertical-compact="true"
-                    :use-css-transforms="true"
-            >
-                <grid-item v-for="item in layout2" :key="item.i"
-                           :x="item.x"
-                           :y="item.y"
-                           :w="item.w"
-                           :h="item.h"
-                           :min-w="2"
-                           :min-h="2"
-                           :i="item.i"
-                           :is-draggable="item.draggable"
-                           :is-resizable="item.resizable"
-                >
-                    <test-element :text="item.i"></test-element>
-                </grid-item>
-            </grid-layout>-->
         </div>
     </div>
 </template>
@@ -111,11 +73,8 @@
 <script>
     import GridItem from './components/GridItem.vue';
     import GridLayout from './components/GridLayout.vue';
-    // import ResponsiveGridLayout from './components/ResponsiveGridLayout.vue';
     import TestElement from './components/TestElement.vue';
     import CustomDragElement from './components/CustomDragElement.vue';
-    import {getDocumentDir, setDocumentDir} from "./helpers/DOM";
-    //var eventBus = require('./eventBus');
 
     let testLayout = [
         {"x":0,"y":0,"w":2,"h":2,"i":"0", resizable: true, draggable: true, static: false, minY: 0, maxY: 2},
@@ -140,14 +99,6 @@
         {"x":2,"y":6,"w":2,"h":2,"i":"19", resizable: false, draggable: false, static: false}
     ];
 
-    /*let testLayout = [
-        { x: 0, y: 0, w: 2, h: 2, i: "0" },
-        { x: 2, y: 0, w: 2, h: 2, i: "1" },
-        { x: 4, y: 0, w: 2, h: 2, i: "2" },
-        { x: 6, y: 0, w: 2, h: 2, i: "3" },
-        { x: 8, y: 0, w: 2, h: 2, i: "4" },
-    ];*/
-
     export default {
         name: 'app',
         components: {
@@ -162,7 +113,6 @@
                 layout2: JSON.parse(JSON.stringify(testLayout)),
                 draggable: true,
                 resizable: true,
-                mirrored: false,
                 responsive: true,
                 preventCollision: false,
                 compact: true,
@@ -196,8 +146,6 @@
                 this.layout.splice(index, 1);
             },
             addItem: function() {
-                // let self = this;
-                //console.log("### LENGTH: " + this.layout.length);
                 let item = {"x":0,"y":0,"w":2,"h":2,"i":this.index+"", whatever: "bbb"};
                 this.index++;
                 this.layout.push(item);
@@ -231,20 +179,6 @@
             containerResized: function(i, newH, newW, newHPx, newWPx){
                 console.log("### CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
             },
-            /**
-             * Add change direction button
-             */
-            changeDirection() {
-                let documentDirection = getDocumentDir();
-                let toggle = "";
-                if (documentDirection === "rtl") {
-                    toggle = "ltr"
-                } else {
-                    toggle = "rtl"
-                }
-                setDocumentDir(toggle);
-                //eventBus.$emit('directionchange');
-            },
 
             layoutCreatedEvent: function(newLayout){
                 console.log("Created layout: ", newLayout)
@@ -269,42 +203,11 @@
     }
 </script>
 
-<style>
-    /*    #app {
-            font-family: 'Avenir', Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-align: center;
-            color: #2c3e50;
-            margin-top: 60px;
-        }
-
-        h1, h2 {
-            font-weight: normal;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            display: inline-block;
-            margin: 0 10px;
-        }
-
-        a {
-            color: #42b983;
-        }*/
-</style>
-
 <style lang="scss">
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /*text-align: center;*/
   color: #2c3e50;
-  /*margin-top: 60px;*/
 }
 </style>

@@ -12,10 +12,6 @@ export function offsetXYFromParentOf(evt) {
     const x = evt.clientX + offsetParent.scrollLeft - offsetParentRect.left;
     const y = evt.clientY + offsetParent.scrollTop - offsetParentRect.top;
 
-    /*const x = Math.round(evt.clientX + offsetParent.scrollLeft - offsetParentRect.left);
-    const y = Math.round(evt.clientY + offsetParent.scrollTop - offsetParentRect.top);*/
-
-
     return {x, y};
 }
 
@@ -43,7 +39,7 @@ export function createCoreData(lastX, lastY, x, y) {
 }
 
 
-function isNum(num)  {
+function isNum(num) {
     return typeof num === 'number' && !isNaN(num);
 }
 
