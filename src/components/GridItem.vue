@@ -87,7 +87,6 @@
 <script>
     import {setTopLeft, setTransform} from '@/helpers/utils';
     import {getControlPosition, createCoreData} from '@/helpers/draggableUtils';
-    import {getColsFromBreakpoint} from '@/helpers/responsiveUtils';
     import {getDocumentDir} from "@/helpers/DOM";
 
     import '@interactjs/auto-start'
@@ -178,11 +177,12 @@
         inject: ["eventBus", "layout"],
         data: function () {
             return {
-                cols: 1,
                 containerWidth: 100,
+                colWidth: 30,
                 rowHeight: 30,
                 margin: [10, 10],
                 maxRows: Infinity,
+                maxCols: Infinity,
                 draggable: null,
                 resizable: null,
                 useCssTransforms: true,
@@ -215,11 +215,6 @@
         created () {
             let self = this;
 
-            // Accessible refernces of functions for removing in beforeDestroy
-            self.updateWidthHandler = function (width) {
-                self.updateWidth(width);
-            };
-
             self.compactHandler = function (layout) {
                 self.compact(layout);
             };
@@ -240,6 +235,10 @@
                 self.rowHeight = rowHeight;
             };
 
+            self.setColWidthHandler = function (colWidth) {
+                self.colWidth = colWidth;
+            };
+
             self.setMaxRowsHandler = function (maxRows) {
                 self.maxRows = maxRows;
             };
@@ -249,43 +248,33 @@
                 this.compact();
             };
 
-            self.setColNum = (colNum) => {
-               self.cols = parseInt(colNum);
-            }
-
-            this.eventBus.$on('updateWidth', self.updateWidthHandler);
             this.eventBus.$on('compact', self.compactHandler);
             this.eventBus.$on('setDraggable', self.setDraggableHandler);
             this.eventBus.$on('setResizable', self.setResizableHandler);
             this.eventBus.$on('setRowHeight', self.setRowHeightHandler);
             this.eventBus.$on('setMaxRows', self.setMaxRowsHandler);
             this.eventBus.$on('directionchange', self.directionchangeHandler);
-            this.eventBus.$on('setColNum', self.setColNum)
+            // this.eventBus.$on('setColNum', self.setColNum)
 
             this.rtl = getDocumentDir() === 'rtl';
         },
         beforeDestroy: function(){
             let self = this;
             //Remove listeners
-            this.eventBus.$off('updateWidth', self.updateWidthHandler);
             this.eventBus.$off('compact', self.compactHandler);
             this.eventBus.$off('setDraggable', self.setDraggableHandler);
             this.eventBus.$off('setResizable', self.setResizableHandler);
             this.eventBus.$off('setRowHeight', self.setRowHeightHandler);
             this.eventBus.$off('setMaxRows', self.setMaxRowsHandler);
             this.eventBus.$off('directionchange', self.directionchangeHandler);
-            this.eventBus.$off('setColNum', self.setColNum);
+            // this.eventBus.$off('setColNum', self.setColNum);
             if (this.interactObj) {
                 this.interactObj.unset() // destroy interact intance
             }
         },
         mounted: function () {
-            if (this.layout.responsive && this.layout.lastBreakpoint) {
-                this.cols = getColsFromBreakpoint(this.layout.lastBreakpoint, this.layout.cols);
-            } else {
-                this.cols = this.layout.colNum;
-            }
             this.rowHeight = this.layout.rowHeight;
+            this.colWidth = this.layout.colWidth;
             this.containerWidth = this.layout.width !== null ? this.layout.width : 100;
             this.margin = this.layout.margin !== undefined ? this.layout.margin : [10, 10];
             this.maxRows = this.layout.maxRows;
@@ -325,8 +314,7 @@
                 this.createStyle();
                 this.emitContainerResized();
             },
-            cols: function () {
-                this.tryMakeResizable();
+            colWidth: function () {
                 this.createStyle();
                 this.emitContainerResized();
             },
@@ -407,13 +395,8 @@
         },
         methods: {
             createStyle: function () {
-                if (this.x + this.w > this.cols) {
-                    this.innerX = 0;
-                    this.innerW = (this.w > this.cols) ? this.cols : this.w
-                } else {
-                  this.innerX = this.x;
-                  this.innerW = this.w;
-                }
+                this.innerX = this.x;
+                this.innerW = this.w;
                 let pos = this.calcPosition(this.innerX, this.innerY, this.innerW, this.innerH);
 
 
@@ -579,17 +562,23 @@
                 this.eventBus.$emit("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
             },
             calcPosition: function (x, y, w, h) {
-                const colWidth = this.calcColWidth();
+                // console.log('111', x, y, w, h);
+                const colWidth = this.colWidth
                 let out;
                 out = {
-                    left: Math.round(colWidth * x + (x + 1) * this.margin[0]),
-                    top: Math.round(this.rowHeight * y + (y + 1) * this.margin[1]),
+                    left: Math.round(colWidth * x),
+                    top: Math.round(this.rowHeight * y),
+                    // left: Math.round(colWidth * x + (x + 1) * this.margin[0]),
+                    // top: Math.round(this.rowHeight * y + (y + 1) * this.margin[1]),
                     // 0 * Infinity === NaN, which causes problems with resize constriants;
                     // Fix this if it occurs.
                     // Note we do it here rather than later because Math.round(Infinity) causes deopt
-                    width: w === Infinity ? w : Math.round(colWidth * w + Math.max(0, w - 1) * this.margin[0]),
-                    height: h === Infinity ? h : Math.round(this.rowHeight * h + Math.max(0, h - 1) * this.margin[1])
+                    width: w === Infinity ? w : Math.round(colWidth * w),
+                    height: h === Infinity ? h : Math.round(this.rowHeight * h)
+                    // width: w === Infinity ? w : Math.round(colWidth * w + Math.max(0, w - 1) * this.margin[0]),
+                    // height: h === Infinity ? h : Math.round(this.rowHeight * h + Math.max(0, h - 1) * this.margin[1])
                 };
+                // console.log('222', out);
 
                 return out;
             },
@@ -601,20 +590,15 @@
              */
             // TODO check if this function needs change in order to support rtl.
             calcXY(top, left) {
-                const colWidth = this.calcColWidth();
-                let x = Math.round((left - this.margin[0]) / (colWidth + this.margin[0]));
-                let y = Math.round((top - this.margin[1]) / (this.rowHeight + this.margin[1]));
+                const colWidth = this.colWidth
+                let x = Math.round(left / colWidth);
+                let y = Math.round(top / this.rowHeight);
 
                 // Capping
-                x = Math.max(Math.min(x, this.cols - this.innerW), 0);
+                x = Math.max(Math.min(x, this.maxCols - this.innerW), 0);
                 y = Math.max(Math.min(y, this.maxRows - this.innerH), 0);
 
                 return {x, y};
-            },
-            // Helper for generating column width
-            calcColWidth() {
-                const colWidth = (this.containerWidth - (this.margin[0] * (this.cols + 1))) / this.cols;
-                return colWidth;
             },
 
             /**
@@ -625,25 +609,19 @@
              * @return {Object} w, h as grid units.
              */
             calcWH(height, width, autoSizeFlag = false) {
-                const colWidth = this.calcColWidth();
-                let w = Math.round((width + this.margin[0]) / (colWidth + this.margin[0]));
+                const colWidth = this.colWidth
+                let w = Math.round(width / colWidth);
                 let h = 0;
                 if (!autoSizeFlag) {
-                    h = Math.round((height + this.margin[1]) / (this.rowHeight + this.margin[1]));
+                    h = Math.round(height / this.rowHeight);
                 } else {
-                    h = Math.ceil((height + this.margin[1]) / (this.rowHeight + this.margin[1]));
+                    h = Math.ceil(height / this.rowHeight);
                 }
 
                 // Capping
-                w = Math.max(Math.min(w, this.cols - this.innerX), 0);
+                w = Math.max(Math.min(w, this.maxCols - this.innerX), 0);
                 h = Math.max(Math.min(h, this.maxRows - this.innerY), 0);
                 return {w, h};
-            },
-            updateWidth: function (width, colNum) {
-                this.containerWidth = width;
-                if (colNum !== undefined && colNum !== null) {
-                    this.cols = colNum;
-                }
             },
             compact: function () {
                 this.createStyle();
@@ -683,8 +661,8 @@
                     }
                 }
                 if (this.resizable && !this.static) {
-                    let maximum = this.calcPosition(0,0,this.maxW, this.maxH);
-                    let minimum = this.calcPosition(0,0, this.minW, this.minH);
+                    let maximum = this.calcPosition(0, 0, this.maxW, this.maxH);
+                    let minimum = this.calcPosition(0, 0, this.minW, this.minH);
 
                     const opts = {
                         edges: {
@@ -729,11 +707,12 @@
                 }
             },
             autoSize: function() {
+                console.log('autosize');
                 // ok here we want to calculate if a resize is needed
                 this.previousW = this.innerW;
                 this.previousH = this.innerH;
 
-                let newSize=this.$slots.default[0].elm.getBoundingClientRect();
+                let newSize = this.$slots.default[0].elm.getBoundingClientRect();
                 let pos = this.calcWH(newSize.height, newSize.width, true);
                 if (pos.w < this.minW) {
                     pos.w = this.minW;

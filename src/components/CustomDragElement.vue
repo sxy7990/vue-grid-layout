@@ -35,7 +35,7 @@
             }
         },
         mounted: function() {
-            console.log("### " + this.text + " ready!");
+            // console.log("### " + this.text + " ready!");
         },
     }
 </script>

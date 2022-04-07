@@ -18,7 +18,6 @@
             <button @click="addItemDynamically">Add an item dynamically</button>
             <input type="checkbox" v-model="draggable"/> Draggable
             <input type="checkbox" v-model="resizable"/> Resizable
-            <input type="checkbox" v-model="responsive"/> Responsive
             <input type="checkbox" v-model="preventCollision"/> Prevent Collision
             <div style="margin-top: 10px;margin-bottom: 10px;">
                 Row Height: <input type="number" v-model="rowHeight"/> Col nums: <input type="number" v-model="colNum"/>
@@ -28,13 +27,13 @@
                 :margin="[parseInt(marginX), parseInt(marginY)]"
                     :layout.sync="layout"
                     :col-num="parseInt(colNum)"
+                    :col-width="colWidth"
                     :row-height="rowHeight"
                     :is-draggable="draggable"
                     :is-resizable="resizable"
                     :prevent-collision="preventCollision"
                     :vertical-compact="compact"
                     :use-css-transforms="true"
-                    :responsive="responsive"
                     @layout-created="layoutCreatedEvent"
                     @layout-before-mount="layoutBeforeMountEvent"
                     @layout-mounted="layoutMountedEvent"
@@ -77,9 +76,9 @@
     import CustomDragElement from './components/CustomDragElement.vue';
 
     let testLayout = [
-        {"x":0,"y":0,"w":2,"h":2,"i":"0", resizable: true, draggable: true, static: false, minY: 0, maxY: 2},
+        {"x":0,"y":0,"w":2,"h":2,"i":"0", resizable: true, draggable: true, static: false},
         {"x":2,"y":0,"w":2,"h":4,"i":"1", resizable: null, draggable: null, static: true},
-        {"x":4,"y":0,"w":2,"h":5,"i":"2", resizable: false, draggable: false, static: false, minX: 4, maxX: 4, minW: 2, maxW: 2, preserveAspectRatio: true},
+        {"x":4,"y":0,"w":2,"h":5,"i":"2", resizable: false, draggable: false, static: false, preserveAspectRatio: true},
         {"x":6,"y":0,"w":2,"h":3,"i":"3", resizable: false, draggable: false, static: false},
         {"x":8,"y":0,"w":2,"h":3,"i":"4", resizable: false, draggable: false, static: false},
         {"x":10,"y":0,"w":2,"h":3,"i":"5", resizable: false, draggable: false, static: false},
@@ -88,7 +87,7 @@
         {"x":4,"y":5,"w":2,"h":5,"i":"8", resizable: false, draggable: false, static: false},
         {"x":6,"y":3,"w":2,"h":4,"i":"9", resizable: false, draggable: false, static: true},
         {"x":8,"y":4,"w":2,"h":4,"i":"10", resizable: false, draggable: false, static: false},
-        {"x":10,"y":4,"w":2,"h":4,"i":"11", resizable: false, draggable: false, static: false, minY: 4},
+        {"x":10,"y":4,"w":2,"h":4,"i":"11", resizable: false, draggable: false, static: false},
         {"x":0,"y":10,"w":2,"h":5,"i":"12", resizable: false, draggable: false, static: false},
         {"x":2,"y":10,"w":2,"h":5,"i":"13", resizable: false, draggable: false, static: false},
         {"x":4,"y":8,"w":2,"h":4,"i":"14", resizable: false, draggable: false, static: false},
@@ -113,10 +112,10 @@
                 layout2: JSON.parse(JSON.stringify(testLayout)),
                 draggable: true,
                 resizable: true,
-                responsive: true,
                 preventCollision: false,
                 compact: true,
-                rowHeight: 30,
+                rowHeight: 40,
+                colWidth: 40,
                 colNum: 12,
                 index: 0,
                 marginX: 10,
@@ -165,38 +164,38 @@
                 this.layout.push(item);
             },
             move: function(i, newX, newY){
-                console.log("MOVE i=" + i + ", X=" + newX + ", Y=" + newY);
+                // console.log("MOVE i=" + i + ", X=" + newX + ", Y=" + newY);
             },
             resize: function(i, newH, newW, newHPx, newWPx){
-                console.log("RESIZE i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
+                // console.log("RESIZE i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
             },
             moved: function(i, newX, newY){
-                console.log("### MOVED i=" + i + ", X=" + newX + ", Y=" + newY);
+                // console.log("### MOVED i=" + i + ", X=" + newX + ", Y=" + newY);
             },
             resized: function(i, newH, newW, newHPx, newWPx){
-                console.log("### RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
+                // console.log("### RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
             },
             containerResized: function(i, newH, newW, newHPx, newWPx){
-                console.log("### CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
+                // console.log("### CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
             },
 
             layoutCreatedEvent: function(newLayout){
-                console.log("Created layout: ", newLayout)
+                // console.log("Created layout: ", newLayout)
             },
             layoutBeforeMountEvent: function(newLayout){
-                console.log("beforeMount layout: ", newLayout)
+                // console.log("beforeMount layout: ", newLayout)
             },
             layoutMountedEvent: function(newLayout){
-                console.log("Mounted layout: ", newLayout)
+                // console.log("Mounted layout: ", newLayout)
             },
             layoutReadyEvent: function(newLayout){
-                console.log("Ready layout: ", newLayout)
+                // console.log("Ready layout: ", newLayout)
             },
             layoutUpdatedEvent: function(newLayout){
-                console.log("Updated layout: ", newLayout)
+                // console.log("Updated layout: ", newLayout)
             },
             breakpointChangedEvent: function(newBreakpoint, newLayout){
-                console.log("breakpoint changed breakpoint=", newBreakpoint, ", layout: ", newLayout );
+                // console.log("breakpoint changed breakpoint=", newBreakpoint, ", layout: ", newLayout );
             }
 
         },

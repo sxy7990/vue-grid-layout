@@ -17,8 +17,17 @@ export type Size = {width: number, height: number};
 export function bottom(layout: Layout): number {
   let max = 0, bottomY;
   for (let i = 0, len = layout.length; i < len; i++) {
-    bottomY = layout[i]. y + layout[i].h;
+    bottomY = layout[i].y + layout[i].h;
     if (bottomY > max) max = bottomY;
+  }
+  return max;
+}
+
+export function right(layout: Layout): number {
+  let max = 0, rightX;
+  for (let i = 0, len = layout.length; i < len; i++) {
+    rightX = layout[i].x + layout[i].w;
+    if (rightX > max) max = rightX;
   }
   return max;
 }

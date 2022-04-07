@@ -20,8 +20,7 @@
     import Vue from 'vue';
     const elementResizeDetectorMaker = require("element-resize-detector");
 
-    import {bottom, compact, getLayoutItem, moveElement, validateLayout, cloneLayout, getAllCollisions} from '@/helpers/utils';
-    import {getBreakpointFromWidth, getColsFromBreakpoint, findOrGenerateResponsiveLayout} from "@/helpers/responsiveUtils";
+    import {bottom, right, compact, getLayoutItem, moveElement, validateLayout, getAllCollisions} from '@/helpers/utils';
 
     import GridItem from './GridItem.vue'
     import {addWindowEventListener, removeWindowEventListener} from "@/helpers/DOM";
@@ -45,11 +44,15 @@
             },
             colNum: {
                 type: Number,
-                default: 12
+                default: Infinity
+            },
+            colWidth: {
+                type: Number,
+                default: 40
             },
             rowHeight: {
                 type: Number,
-                default: 150
+                default: 40
             },
             maxRows: {
                 type: Number,
@@ -81,23 +84,9 @@
                 type: Array,
                 required: true,
             },
-            responsive: {
-                type: Boolean,
-                default: false
-            },
-            responsiveLayouts: {
-                type: Object,
-                default: function() {
-                    return {};
-                }
-            },
             breakpoints:{
                 type: Object,
                 default: function(){return{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-            },
-            cols:{
-                type: Object,
-                default: function(){return{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }},
             },
             preventCollision: {
                 type: Boolean,
@@ -167,8 +156,6 @@
                 this.$nextTick(function() {
                     self.onWindowResize();
 
-                    self.initResponsiveFeatures();
-
                     addWindowEventListener('resize', self.onWindowResize);
 
                     compact(self.layout, self.verticalCompact);
@@ -193,7 +180,6 @@
             width: function (newval, oldval) {
                 const self = this;
                 this.$nextTick(function () {
-                    this.eventBus.$emit("updateWidth", this.width);
                     if (oldval === null) {
                         /*
                             If oldval == null is when the width has never been
@@ -228,6 +214,9 @@
             colNum: function (val) {
                 this.eventBus.$emit("setColNum", val);
             },
+            colWidth: function (val) {
+                this.eventBus.$emit("setColWidth", val);
+            },
             rowHeight: function() {
                 this.eventBus.$emit("setRowHeight", this.rowHeight);
             },
@@ -236,13 +225,6 @@
             },
             isResizable: function() {
                 this.eventBus.$emit("setResizable", this.isResizable);
-            },
-            responsive() {
-                if (!this.responsive) {
-                    this.$emit('update:layout', this.originalLayout);
-                    this.eventBus.$emit("setColNum", this.colNum);
-                }
-                this.onWindowResize();
             },
             maxRows: function() {
                 this.eventBus.$emit("setMaxRows", this.maxRows);
@@ -270,11 +252,9 @@
                         }
 
                         this.lastLayoutLength = this.layout.length;
-                        this.initResponsiveFeatures();
                     }
 
                     compact(this.layout, this.verticalCompact);
-                    this.eventBus.$emit("updateWidth", this.width);
                     this.updateHeight();
 
                     this.$emit('layout-updated',this.layout)
@@ -282,7 +262,8 @@
             },
             updateHeight: function () {
                 this.mergedStyle = {
-                    height: this.containerHeight()
+                    height: this.containerHeight(),
+                    width: this.containerWidth()
                 };
             },
             onWindowResize: function () {
@@ -291,9 +272,14 @@
                 }
                 this.eventBus.$emit("resizeEvent");
             },
+            containerWidth: function () {
+                if (!this.autoSize) return;
+                const containerWidth = right(this.layout) * (this.colWidth) + 'px';
+                return containerWidth;
+            },
             containerHeight: function () {
                 if (!this.autoSize) return;
-                const containerHeight = bottom(this.layout) * (this.rowHeight + this.margin[1]) + this.margin[1] + 'px';
+                const containerHeight = bottom(this.layout) * (this.rowHeight) + 'px';
                 return containerHeight;
             },
             dragEvent: function (eventName, id, x, y, h, w) {
@@ -312,7 +298,6 @@
                     this.$nextTick(function() {
                         this.isDragging = true;
                     });
-                    this.eventBus.$emit("updateWidth", this.width);
                 } else {
                     this.$nextTick(function() {
                         this.isDragging = false;
@@ -371,7 +356,6 @@
                     this.$nextTick(function() {
                         this.isDragging = true;
                     });
-                    this.eventBus.$emit("updateWidth", this.width);
 
                 } else {
                     this.$nextTick(function() {
@@ -379,53 +363,11 @@
                     });
                 }
 
-                if (this.responsive) this.responsiveGridLayout();
-
                 compact(this.layout, this.verticalCompact);
                 this.eventBus.$emit("compact");
                 this.updateHeight();
 
                 if (eventName === 'resizeend') this.$emit('layout-updated', this.layout);
-            },
-
-            // finds or generates new layouts for set breakpoints
-            responsiveGridLayout(){
-                let newBreakpoint = getBreakpointFromWidth(this.breakpoints, this.width);
-                let newCols = getColsFromBreakpoint(newBreakpoint, this.cols);
-
-                // save actual layout in layouts
-                if(this.lastBreakpoint != null && !this.layouts[this.lastBreakpoint])
-                    this.layouts[this.lastBreakpoint] = cloneLayout(this.layout);
-
-                // Find or generate a new layout.
-                let layout = findOrGenerateResponsiveLayout(
-                    this.originalLayout,
-                    this.layouts,
-                    this.breakpoints,
-                    newBreakpoint,
-                    this.lastBreakpoint,
-                    newCols,
-                    this.verticalCompact
-                );
-
-                // Store the new layout.
-                this.layouts[newBreakpoint] = layout;
-
-                if (this.lastBreakpoint !== newBreakpoint) {
-                    this.$emit('breakpoint-changed', newBreakpoint, layout);
-                }
-
-                // new prop sync
-                this.$emit('update:layout', layout);
-
-                this.lastBreakpoint = newBreakpoint;
-                this.eventBus.$emit("setColNum", getColsFromBreakpoint(newBreakpoint, this.cols));
-            },
-
-            // clear all responsive layouts
-            initResponsiveFeatures(){
-                // clear layouts
-                this.layouts = Object.assign({}, this.responsiveLayouts);
             },
 
             // find difference in layouts

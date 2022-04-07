@@ -49,6 +49,7 @@
 }
 
 .vue-grid-item:not(.vue-grid-placeholder) {
+    box-sizing: border-box;
     background: #ccc;
     border: 1px solid black;
 }
