@@ -283,7 +283,9 @@
                 return containerHeight;
             },
             dragEvent: function (eventName, id, x, y, h, w) {
+                console.log('111', eventName, id, x, y, h, w);
                 let l = getLayoutItem(this.layout, id);
+                console.log('222', l.x, l.y);
                 //GetLayoutItem sometimes returns null object
                 if (l === undefined || l === null){
                     l = {x:0, y:0}

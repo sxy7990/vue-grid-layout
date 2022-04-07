@@ -23,47 +23,48 @@
                 Row Height: <input type="number" v-model="rowHeight"/> Col nums: <input type="number" v-model="colNum"/>
                 Margin x: <input type="number" v-model="marginX"/> Margin y: <input type="number" v-model="marginY"/>
             </div>
-            <grid-layout
-                :margin="[parseInt(marginX), parseInt(marginY)]"
-                    :layout.sync="layout"
-                    :col-num="parseInt(colNum)"
-                    :col-width="colWidth"
-                    :row-height="rowHeight"
-                    :is-draggable="draggable"
-                    :is-resizable="resizable"
-                    :prevent-collision="preventCollision"
-                    :vertical-compact="compact"
-                    :use-css-transforms="true"
-                    @layout-created="layoutCreatedEvent"
-                    @layout-before-mount="layoutBeforeMountEvent"
-                    @layout-mounted="layoutMountedEvent"
-                    @layout-ready="layoutReadyEvent"
-                    @layout-updated="layoutUpdatedEvent"
-                    @breakpoint-changed="breakpointChangedEvent"
-            >
-                <grid-item v-for="item in layout" :key="item.i"
-                           :static="item.static"
-                           :x="item.x"
-                           :y="item.y"
-                           :w="item.w"
-                           :h="item.h"
-                           :i="item.i"
-                           :min-w="item.minW"
-                           :max-w="item.maxW"
-                           :min-x="item.minX"
-                           :max-x="item.maxX"
-                           :min-y="item.minY"
-                           :max-y="item.maxY"
-                           :preserve-aspect-ratio="item.preserveAspectRatio"
-                           @resize="resize"
-                           @move="move"
-                           @resized="resized"
-                           @container-resized="containerResized"
-                           @moved="moved"
+            <div style="width: 1000px; height: 720px; overflow: auto; background-color: rgba(23, 23, 112, 0.1);">
+                <grid-layout
+                    :margin="[parseInt(marginX), parseInt(marginY)]"
+                        :layout.sync="layout"
+                        :col-num="parseInt(colNum)"
+                        :col-width="colWidth"
+                        :row-height="rowHeight"
+                        :is-draggable="draggable"
+                        :is-resizable="resizable"
+                        :prevent-collision="preventCollision"
+                        :vertical-compact="compact"
+                        :use-css-transforms="true"
+                        @layout-created="layoutCreatedEvent"
+                        @layout-before-mount="layoutBeforeMountEvent"
+                        @layout-mounted="layoutMountedEvent"
+                        @layout-ready="layoutReadyEvent"
+                        @layout-updated="layoutUpdatedEvent"
+                        @breakpoint-changed="breakpointChangedEvent"
                 >
-                    <test-element :text="item.i" @removeItem="removeItem($event)"></test-element>
-                </grid-item>
-            </grid-layout>
+                    <grid-item v-for="item in layout" :key="item.i"
+                            :static="item.static"
+                            :x="item.x"
+                            :y="item.y"
+                            :w="item.w"
+                            :h="item.h"
+                            :i="item.i"
+                            :min-w="item.minW"
+                            :max-w="item.maxW"
+                            :min-x="item.minX"
+                            :max-x="item.maxX"
+                            :min-y="item.minY"
+                            :max-y="item.maxY"
+                            @resize="resize"
+                            @move="move"
+                            @resized="resized"
+                            @container-resized="containerResized"
+                            @moved="moved"
+                    >
+                        <test-element :text="item.i" @removeItem="removeItem($event)"></test-element>
+                    </grid-item>
+                </grid-layout>
+            </div>
             <hr/>
         </div>
     </div>
@@ -78,24 +79,12 @@
     let testLayout = [
         {"x":0,"y":0,"w":2,"h":2,"i":"0", resizable: true, draggable: true, static: false},
         {"x":2,"y":0,"w":2,"h":4,"i":"1", resizable: null, draggable: null, static: true},
-        {"x":4,"y":0,"w":2,"h":5,"i":"2", resizable: false, draggable: false, static: false, preserveAspectRatio: true},
+        {"x":4,"y":0,"w":2,"h":5,"i":"2", resizable: false, draggable: false, static: false},
         {"x":6,"y":0,"w":2,"h":3,"i":"3", resizable: false, draggable: false, static: false},
         {"x":8,"y":0,"w":2,"h":3,"i":"4", resizable: false, draggable: false, static: false},
         {"x":10,"y":0,"w":2,"h":3,"i":"5", resizable: false, draggable: false, static: false},
         {"x":0,"y":5,"w":2,"h":5,"i":"6", resizable: false, draggable: false, static: false},
         {"x":2,"y":5,"w":2,"h":5,"i":"7", resizable: false, draggable: false, static: false},
-        {"x":4,"y":5,"w":2,"h":5,"i":"8", resizable: false, draggable: false, static: false},
-        {"x":6,"y":3,"w":2,"h":4,"i":"9", resizable: false, draggable: false, static: true},
-        {"x":8,"y":4,"w":2,"h":4,"i":"10", resizable: false, draggable: false, static: false},
-        {"x":10,"y":4,"w":2,"h":4,"i":"11", resizable: false, draggable: false, static: false},
-        {"x":0,"y":10,"w":2,"h":5,"i":"12", resizable: false, draggable: false, static: false},
-        {"x":2,"y":10,"w":2,"h":5,"i":"13", resizable: false, draggable: false, static: false},
-        {"x":4,"y":8,"w":2,"h":4,"i":"14", resizable: false, draggable: false, static: false},
-        {"x":6,"y":8,"w":2,"h":4,"i":"15", resizable: false, draggable: false, static: false},
-        {"x":8,"y":10,"w":2,"h":5,"i":"16", resizable: false, draggable: false, static: false},
-        {"x":10,"y":4,"w":2,"h":2,"i":"17", resizable: false, draggable: false, static: false},
-        {"x":0,"y":9,"w":2,"h":3,"i":"18", resizable: false, draggable: false, static: false},
-        {"x":2,"y":6,"w":2,"h":2,"i":"19", resizable: false, draggable: false, static: false}
     ];
 
     export default {
@@ -112,7 +101,7 @@
                 layout2: JSON.parse(JSON.stringify(testLayout)),
                 draggable: true,
                 resizable: true,
-                preventCollision: false,
+                preventCollision: true,
                 compact: true,
                 rowHeight: 40,
                 colWidth: 40,

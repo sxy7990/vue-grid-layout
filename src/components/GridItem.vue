@@ -167,11 +167,6 @@
                 type: String,
                 required: false,
                 default: 'a, button'
-            },
-            preserveAspectRatio: {
-                type: Boolean,
-                required: false,
-                default: false,
             }
         },
         inject: ["eventBus", "layout"],
@@ -538,7 +533,6 @@
                     }
                     case "dragmove": {
                         const coreEvent = createCoreData(this.lastX, this.lastY, x, y);
-
                         newPosition.left = this.dragging.left + coreEvent.deltaX;
                         newPosition.top = this.dragging.top + coreEvent.deltaY;
                         this.dragging = newPosition;
@@ -562,7 +556,6 @@
                 this.eventBus.$emit("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
             },
             calcPosition: function (x, y, w, h) {
-                // console.log('111', x, y, w, h);
                 const colWidth = this.colWidth
                 let out;
                 out = {
@@ -578,7 +571,6 @@
                     // width: w === Infinity ? w : Math.round(colWidth * w + Math.max(0, w - 1) * this.margin[0]),
                     // height: h === Infinity ? h : Math.round(this.rowHeight * h + Math.max(0, h - 1) * this.margin[1])
                 };
-                // console.log('222', out);
 
                 return out;
             },
@@ -683,14 +675,6 @@
                             }
                         }
                     };
-
-                    if (this.preserveAspectRatio) {
-                        opts.modifiers = [
-                            interact.modifiers.aspectRatio({
-                                ratio: 'preserve'
-                            }),
-                        ]
-                    }
 
                     this.interactObj.resizable(opts);
                     if (!this.resizeEventSet) {
