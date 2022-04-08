@@ -19,11 +19,7 @@
             <input type="checkbox" v-model="draggable"/> Draggable
             <input type="checkbox" v-model="resizable"/> Resizable
             <input type="checkbox" v-model="preventCollision"/> Prevent Collision
-            <div style="margin-top: 10px;margin-bottom: 10px;">
-                Row Height: <input type="number" v-model="unit"/> Col nums: <input type="number" v-model="colNum"/>
-                Margin x: <input type="number" v-model="marginX"/> Margin y: <input type="number" v-model="marginY"/>
-            </div>
-            <div style="width: 1000px; height: 720px; overflow: auto; background-color: rgba(23, 23, 112, 0.1);">
+            <div style="margin-top: 10px; width: 1000px; height: 720px; overflow: auto; background-color: rgba(23, 23, 112, 0.1);">
                 <grid-layout
                     :margin="[parseInt(marginX), parseInt(marginY)]"
                         :layout.sync="layout"
@@ -150,35 +146,35 @@
                 this.layout.push(item);
             },
             move: function(i, newX, newY){
-                // console.log("MOVE i=" + i + ", X=" + newX + ", Y=" + newY);
+                console.log("MOVE i=" + i + ", X=" + newX + ", Y=" + newY);
             },
             resize: function(i, newH, newW, newHPx, newWPx){
-                // console.log("RESIZE i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
+                console.log("RESIZE i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
             },
             moved: function(i, newX, newY){
-                // console.log("### MOVED i=" + i + ", X=" + newX + ", Y=" + newY);
+                console.log("### MOVED i=" + i + ", X=" + newX + ", Y=" + newY);
             },
             resized: function(i, newH, newW, newHPx, newWPx){
-                // console.log("### RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
+                console.log("### RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
             },
             containerResized: function(i, newH, newW, newHPx, newWPx){
-                // console.log("### CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
+                console.log("### CONTAINER RESIZED i=" + i + ", H=" + newH + ", W=" + newW + ", H(px)=" + newHPx + ", W(px)=" + newWPx);
             },
 
             layoutCreatedEvent: function(newLayout){
-                // console.log("Created layout: ", newLayout)
+                console.log("Created layout: ", newLayout)
             },
             layoutBeforeMountEvent: function(newLayout){
-                // console.log("beforeMount layout: ", newLayout)
+                console.log("beforeMount layout: ", newLayout)
             },
             layoutMountedEvent: function(newLayout){
-                // console.log("Mounted layout: ", newLayout)
+                console.log("Mounted layout: ", newLayout)
             },
             layoutReadyEvent: function(newLayout){
-                // console.log("Ready layout: ", newLayout)
+                console.log("Ready layout: ", newLayout)
             },
             layoutUpdatedEvent: function(newLayout){
-                // console.log("Updated layout: ", newLayout)
+                console.log("Updated layout: ", newLayout)
             },
         },
     }

@@ -23,11 +23,33 @@ export function bottom(layout: Layout): number {
   return max;
 }
 
+export function handletop(layout: Layout): number {
+  let max = 0, topY;
+  for (let i = 0, len = layout.length; i < len; i++) {
+    if (layout[i].y < 0) {
+      topY = Math.abs(layout[i].y);
+    }
+    if (topY > max) max = topY;
+  }
+  return max;
+}
+
 export function right(layout: Layout): number {
   let max = 0, rightX;
   for (let i = 0, len = layout.length; i < len; i++) {
     rightX = layout[i].x + layout[i].w;
     if (rightX > max) max = rightX;
+  }
+  return max;
+}
+
+export function handleleft(layout: Layout): number {
+  let max = 0, leftX;
+  for (let i = 0, len = layout.length; i < len; i++) {
+    if (layout[i].x < 0) {
+      leftX = Math.abs(layout[i].x);
+    }
+    if (leftX > max) max = leftX;
   }
   return max;
 }
@@ -57,6 +79,21 @@ export function collides(l1: LayoutItem, l2: LayoutItem): boolean {
   if (l1.y + l1.h <= l2.y) return false; // l1 is above l2
   if (l1.y >= l2.y + l2.h) return false; // l1 is below l2
   return true; // boxes overlap
+}
+
+export function handleNegative(layout: Layout): Layout {
+  const top = handletop(layout);
+  const left = handleleft(layout);
+  for (let i = 0, len = layout.length; i < len; i++) {
+    const l = layout[i];
+    if (left > 0) {
+      l.x = l.x + left
+    }
+    if (top > 0) {
+      l.y = l.y + top
+    }
+  }
+  return layout;
 }
 
 /**

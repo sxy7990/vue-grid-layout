@@ -14,13 +14,15 @@
     .vue-grid-layout {
         position: relative;
         transition: height 200ms ease;
+        background: -webkit-linear-gradient(top, transparent 39px, blue 40px), -webkit-linear-gradient(left, transparent 39px, blue 40px);
+        background-size: 40px 40px;
     }
 </style>
 <script>
     import Vue from 'vue';
     const elementResizeDetectorMaker = require("element-resize-detector");
 
-    import {bottom, right, compact, getLayoutItem, moveElement, validateLayout, getAllCollisions} from '@/helpers/utils';
+    import {bottom, handletop, handleleft, right, compact, handleNegative, getLayoutItem, moveElement, validateLayout, getAllCollisions} from '@/helpers/utils';
 
     import GridItem from './GridItem.vue'
     import {addWindowEventListener, removeWindowEventListener} from "@/helpers/DOM";
@@ -142,7 +144,8 @@
 
                     compact(self.layout, self.verticalCompact);
 
-                    self.$emit('layout-updated',self.layout)
+                    self.$emit('layout-updated', self.layout)
+                    handleNegative(this.layout)
 
                     self.updatePlayground();
                     self.$nextTick(function () {
@@ -233,7 +236,8 @@
                     compact(this.layout, this.verticalCompact);
                     this.updatePlayground();
 
-                    this.$emit('layout-updated',this.layout)
+                    this.$emit('layout-updated', this.layout)
+                    handleNegative(this.layout)
                 }
             },
             updatePlayground: function () {
@@ -250,12 +254,12 @@
             },
             containerWidth: function () {
                 if (!this.autoSize) return;
-                const containerWidth = right(this.layout) * (this.unit) + 'px';
+                const containerWidth = handleleft(this.layout) * this.unit + right(this.layout) * this.unit + 'px';
                 return containerWidth;
             },
             containerHeight: function () {
                 if (!this.autoSize) return;
-                const containerHeight = bottom(this.layout) * (this.unit) + 'px';
+                const containerHeight = handletop(this.layout) * this.unit + bottom(this.layout) * this.unit + 'px';
                 return containerHeight;
             },
             dragEvent: function (eventName, id, x, y, h, w) {
@@ -286,7 +290,10 @@
                 // needed because vue can't detect changes on array element properties
                 this.eventBus.$emit("compact");
                 this.updatePlayground();
-                if (eventName === 'dragend') this.$emit('layout-updated', this.layout);
+                if (eventName === 'dragend') {
+                    this.$emit('layout-updated', this.layout);
+                    handleNegative(this.layout)
+                }
             },
             resizeEvent: function (eventName, id, x, y, h, w) {
                 let l = getLayoutItem(this.layout, id);
@@ -343,7 +350,10 @@
                 this.eventBus.$emit("compact");
                 this.updatePlayground();
 
-                if (eventName === 'resizeend') this.$emit('layout-updated', this.layout);
+                if (eventName === 'resizeend') {
+                    this.$emit('layout-updated', this.layout);
+                    handleNegative(this.layout)
+                }
             },
 
             // find difference in layouts
