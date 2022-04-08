@@ -175,7 +175,6 @@
                 containerWidth: 100,
                 colWidth: 30,
                 rowHeight: 30,
-                margin: [10, 10],
                 maxRows: Infinity,
                 maxCols: Infinity,
                 draggable: null,
@@ -249,7 +248,6 @@
             this.eventBus.$on('setRowHeight', self.setRowHeightHandler);
             this.eventBus.$on('setMaxRows', self.setMaxRowsHandler);
             this.eventBus.$on('directionchange', self.directionchangeHandler);
-            // this.eventBus.$on('setColNum', self.setColNum)
 
             this.rtl = getDocumentDir() === 'rtl';
         },
@@ -262,7 +260,6 @@
             this.eventBus.$off('setRowHeight', self.setRowHeightHandler);
             this.eventBus.$off('setMaxRows', self.setMaxRowsHandler);
             this.eventBus.$off('directionchange', self.directionchangeHandler);
-            // this.eventBus.$off('setColNum', self.setColNum);
             if (this.interactObj) {
                 this.interactObj.unset() // destroy interact intance
             }
@@ -271,7 +268,6 @@
             this.rowHeight = this.layout.rowHeight;
             this.colWidth = this.layout.colWidth;
             this.containerWidth = this.layout.width !== null ? this.layout.width : 100;
-            this.margin = this.layout.margin !== undefined ? this.layout.margin : [10, 10];
             this.maxRows = this.layout.maxRows;
 
             if (this.isDraggable === null) {
@@ -349,14 +345,6 @@
             },
             maxW: function () {
                 this.tryMakeResizable();
-            },
-            "$parent.margin": function (margin) {
-                if (!margin || (margin[0] == this.margin[0] && margin[1] == this.margin[1])) {
-                    return;
-                }
-                this.margin = margin.map(m => Number(m));
-                this.createStyle();
-                this.emitContainerResized();
             },
         },
         computed: {
@@ -561,15 +549,11 @@
                 out = {
                     left: Math.round(colWidth * x),
                     top: Math.round(this.rowHeight * y),
-                    // left: Math.round(colWidth * x + (x + 1) * this.margin[0]),
-                    // top: Math.round(this.rowHeight * y + (y + 1) * this.margin[1]),
                     // 0 * Infinity === NaN, which causes problems with resize constriants;
                     // Fix this if it occurs.
                     // Note we do it here rather than later because Math.round(Infinity) causes deopt
                     width: w === Infinity ? w : Math.round(colWidth * w),
                     height: h === Infinity ? h : Math.round(this.rowHeight * h)
-                    // width: w === Infinity ? w : Math.round(colWidth * w + Math.max(0, w - 1) * this.margin[0]),
-                    // height: h === Infinity ? h : Math.round(this.rowHeight * h + Math.max(0, h - 1) * this.margin[1])
                 };
 
                 return out;
@@ -691,7 +675,6 @@
                 }
             },
             autoSize: function() {
-                console.log('autosize');
                 // ok here we want to calculate if a resize is needed
                 this.previousW = this.innerW;
                 this.previousH = this.innerH;

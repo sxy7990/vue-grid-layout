@@ -18,7 +18,6 @@ export function offsetXYFromParentOf(evt) {
 
 // Create an data object exposed by <DraggableCore>'s events
 export function createCoreData(lastX, lastY, x, y) {
-    console.log('333', lastX, lastY, x, y);
     // State changes are often (but not always!) async. We want the latest value.
     const isStart = !isNum(lastX);
 

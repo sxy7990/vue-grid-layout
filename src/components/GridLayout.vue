@@ -42,10 +42,6 @@
                 type: Boolean,
                 default: true
             },
-            colNum: {
-                type: Number,
-                default: Infinity
-            },
             colWidth: {
                 type: Number,
                 default: 40
@@ -58,11 +54,9 @@
                 type: Number,
                 default: Infinity
             },
-            margin: {
-                type: Array,
-                default: function () {
-                    return [10, 10];
-                }
+            maxCols: {
+                type: Number,
+                default: Infinity
             },
             isDraggable: {
                 type: Boolean,
@@ -76,17 +70,9 @@
                 type: Boolean,
                 default: true
             },
-            verticalCompact: {
-                type: Boolean,
-                default: true
-            },
             layout: {
                 type: Array,
                 required: true,
-            },
-            breakpoints:{
-                type: Object,
-                default: function(){return{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
             },
             preventCollision: {
                 type: Boolean,
@@ -110,9 +96,9 @@
                     h: 0,
                     i: -1
                 },
-                layouts: {}, // array to store all layouts from different breakpoints
-                lastBreakpoint: null, // store last active breakpoint
+                layouts: {},
                 originalLayout: null, // store original Layout
+                verticalCompact: false,
             };
         },
         created () {
@@ -211,9 +197,6 @@
             layout: function () {
                 this.layoutUpdate();
             },
-            colNum: function (val) {
-                this.eventBus.$emit("setColNum", val);
-            },
             colWidth: function (val) {
                 this.eventBus.$emit("setColWidth", val);
             },
@@ -229,8 +212,8 @@
             maxRows: function() {
                 this.eventBus.$emit("setMaxRows", this.maxRows);
             },
-            margin() {
-                this.updateHeight();
+            maxCols: function() {
+                this.eventBus.$emit("setMaxCols", this.maxCols);
             }
         },
         methods: {
@@ -283,9 +266,7 @@
                 return containerHeight;
             },
             dragEvent: function (eventName, id, x, y, h, w) {
-                console.log('111', eventName, id, x, y, h, w);
                 let l = getLayoutItem(this.layout, id);
-                console.log('222', l.x, l.y);
                 //GetLayoutItem sometimes returns null object
                 if (l === undefined || l === null){
                     l = {x:0, y:0}
