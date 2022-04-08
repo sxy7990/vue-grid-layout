@@ -11,8 +11,7 @@
 <style>
     .vue-grid-item {
         transition: all 200ms ease;
-        transition-property: left, top, right;
-        /* add right for rtl */
+        transition-property: left, top;
     }
 
     .vue-grid-item.no-touch {
@@ -173,8 +172,7 @@
         data: function () {
             return {
                 containerWidth: 100,
-                colWidth: 30,
-                rowHeight: 30,
+                unit: 40,
                 maxRows: Infinity,
                 maxCols: Infinity,
                 draggable: null,
@@ -191,7 +189,6 @@
                 lastW: NaN,
                 lastH: NaN,
                 style: {},
-                rtl: false,
 
                 dragEventSet: false,
                 resizeEventSet: false,
@@ -225,31 +222,20 @@
                 }
             };
 
-            self.setRowHeightHandler = function (rowHeight) {
-                self.rowHeight = rowHeight;
-            };
-
-            self.setColWidthHandler = function (colWidth) {
-                self.colWidth = colWidth;
-            };
+            self.setUnitHandler = function (unit) {
+                self.unit = unit
+            }
 
             self.setMaxRowsHandler = function (maxRows) {
                 self.maxRows = maxRows;
             };
 
-            self.directionchangeHandler = () => {
-                this.rtl = getDocumentDir() === 'rtl';
-                this.compact();
-            };
-
             this.eventBus.$on('compact', self.compactHandler);
             this.eventBus.$on('setDraggable', self.setDraggableHandler);
             this.eventBus.$on('setResizable', self.setResizableHandler);
-            this.eventBus.$on('setRowHeight', self.setRowHeightHandler);
+            this.eventBus.$on('setUnit', self.setUnitHandler);
             this.eventBus.$on('setMaxRows', self.setMaxRowsHandler);
             this.eventBus.$on('directionchange', self.directionchangeHandler);
-
-            this.rtl = getDocumentDir() === 'rtl';
         },
         beforeDestroy: function(){
             let self = this;
@@ -257,7 +243,7 @@
             this.eventBus.$off('compact', self.compactHandler);
             this.eventBus.$off('setDraggable', self.setDraggableHandler);
             this.eventBus.$off('setResizable', self.setResizableHandler);
-            this.eventBus.$off('setRowHeight', self.setRowHeightHandler);
+            this.eventBus.$off('setUnit', self.setUnitHandler);
             this.eventBus.$off('setMaxRows', self.setMaxRowsHandler);
             this.eventBus.$off('directionchange', self.directionchangeHandler);
             if (this.interactObj) {
@@ -265,8 +251,7 @@
             }
         },
         mounted: function () {
-            this.rowHeight = this.layout.rowHeight;
-            this.colWidth = this.layout.colWidth;
+            this.unit = this.layout.unit;
             this.containerWidth = this.layout.width !== null ? this.layout.width : 100;
             this.maxRows = this.layout.maxRows;
 
@@ -301,11 +286,7 @@
             resizable: function () {
                 this.tryMakeResizable();
             },
-            rowHeight: function () {
-                this.createStyle();
-                this.emitContainerResized();
-            },
-            colWidth: function () {
+            unit: function () {
                 this.createStyle();
                 this.emitContainerResized();
             },
@@ -330,10 +311,6 @@
                 this.innerW = newVal;
                 this.createStyle();
             },
-            renderRtl: function () {
-                this.tryMakeResizable();
-                this.createStyle();
-            },
             minH: function () {
                 this.tryMakeResizable();
             },
@@ -355,7 +332,6 @@
                     'resizing' : this.isResizing,
                     'vue-draggable-dragging' : this.isDragging,
                     'cssTransforms' : this.useCssTransforms,
-                    'render-rtl' : this.renderRtl,
                     'disable-userselect': this.isDragging,
                     'no-touch': this.isAndroid && this.draggableOrResizableAndNotStatic
                 }
@@ -368,9 +344,6 @@
             },
             isAndroid() {
                 return navigator.userAgent.toLowerCase().indexOf("android") !== -1;
-            },
-            renderRtl() {
-                return this.rtl;
             },
             resizableHandleClass() {
                 return 'vue-resizable-handle';
@@ -544,16 +517,15 @@
                 this.eventBus.$emit("dragEvent", event.type, this.i, pos.x, pos.y, this.innerH, this.innerW);
             },
             calcPosition: function (x, y, w, h) {
-                const colWidth = this.colWidth
                 let out;
                 out = {
-                    left: Math.round(colWidth * x),
-                    top: Math.round(this.rowHeight * y),
+                    left: Math.round(this.unit * x),
+                    top: Math.round(this.unit * y),
                     // 0 * Infinity === NaN, which causes problems with resize constriants;
                     // Fix this if it occurs.
                     // Note we do it here rather than later because Math.round(Infinity) causes deopt
-                    width: w === Infinity ? w : Math.round(colWidth * w),
-                    height: h === Infinity ? h : Math.round(this.rowHeight * h)
+                    width: w === Infinity ? w : Math.round(this.unit * w),
+                    height: h === Infinity ? h : Math.round(this.unit * h)
                 };
 
                 return out;
@@ -564,11 +536,9 @@
              * @param  {Number} left Left position (relative to parent) in pixels.
              * @return {Object} x and y in grid units.
              */
-            // TODO check if this function needs change in order to support rtl.
             calcXY(top, left) {
-                const colWidth = this.colWidth
-                let x = Math.round(left / colWidth);
-                let y = Math.round(top / this.rowHeight);
+                let x = Math.round(left / this.unit);
+                let y = Math.round(top / this.unit);
 
                 // Capping
                 x = Math.max(Math.min(x, this.maxCols - this.innerW), 0);
@@ -585,13 +555,12 @@
              * @return {Object} w, h as grid units.
              */
             calcWH(height, width, autoSizeFlag = false) {
-                const colWidth = this.colWidth
-                let w = Math.round(width / colWidth);
+                let w = Math.round(width / this.unit);
                 let h = 0;
                 if (!autoSizeFlag) {
-                    h = Math.round(height / this.rowHeight);
+                    h = Math.round(height / this.unit);
                 } else {
-                    h = Math.ceil(height / this.rowHeight);
+                    h = Math.ceil(height / this.unit);
                 }
 
                 // Capping

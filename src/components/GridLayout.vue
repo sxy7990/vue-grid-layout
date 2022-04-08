@@ -42,11 +42,7 @@
                 type: Boolean,
                 default: true
             },
-            colWidth: {
-                type: Number,
-                default: 40
-            },
-            rowHeight: {
+            unit: {
                 type: Number,
                 default: 40
             },
@@ -148,7 +144,7 @@
 
                     self.$emit('layout-updated',self.layout)
 
-                    self.updateHeight();
+                    self.updatePlayground();
                     self.$nextTick(function () {
                         this.erd = elementResizeDetectorMaker({
                             strategy: "scroll", //<- For ultra performance.
@@ -191,17 +187,14 @@
                             this.$emit('layout-ready', self.layout);
                         });
                     }
-                    this.updateHeight();
+                    this.updatePlayground();
                 });
             },
             layout: function () {
                 this.layoutUpdate();
             },
-            colWidth: function (val) {
-                this.eventBus.$emit("setColWidth", val);
-            },
-            rowHeight: function() {
-                this.eventBus.$emit("setRowHeight", this.rowHeight);
+            unit: function () {
+                this.eventBus.$emit("setUnit", this.unit);
             },
             isDraggable: function() {
                 this.eventBus.$emit("setDraggable", this.isDraggable);
@@ -238,12 +231,12 @@
                     }
 
                     compact(this.layout, this.verticalCompact);
-                    this.updateHeight();
+                    this.updatePlayground();
 
                     this.$emit('layout-updated',this.layout)
                 }
             },
-            updateHeight: function () {
+            updatePlayground: function () {
                 this.mergedStyle = {
                     height: this.containerHeight(),
                     width: this.containerWidth()
@@ -257,12 +250,12 @@
             },
             containerWidth: function () {
                 if (!this.autoSize) return;
-                const containerWidth = right(this.layout) * (this.colWidth) + 'px';
+                const containerWidth = right(this.layout) * (this.unit) + 'px';
                 return containerWidth;
             },
             containerHeight: function () {
                 if (!this.autoSize) return;
-                const containerHeight = bottom(this.layout) * (this.rowHeight) + 'px';
+                const containerHeight = bottom(this.layout) * (this.unit) + 'px';
                 return containerHeight;
             },
             dragEvent: function (eventName, id, x, y, h, w) {
@@ -292,7 +285,7 @@
                 compact(this.layout, this.verticalCompact);
                 // needed because vue can't detect changes on array element properties
                 this.eventBus.$emit("compact");
-                this.updateHeight();
+                this.updatePlayground();
                 if (eventName === 'dragend') this.$emit('layout-updated', this.layout);
             },
             resizeEvent: function (eventName, id, x, y, h, w) {
@@ -348,7 +341,7 @@
 
                 compact(this.layout, this.verticalCompact);
                 this.eventBus.$emit("compact");
-                this.updateHeight();
+                this.updatePlayground();
 
                 if (eventName === 'resizeend') this.$emit('layout-updated', this.layout);
             },

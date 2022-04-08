@@ -20,7 +20,7 @@
             <input type="checkbox" v-model="resizable"/> Resizable
             <input type="checkbox" v-model="preventCollision"/> Prevent Collision
             <div style="margin-top: 10px;margin-bottom: 10px;">
-                Row Height: <input type="number" v-model="rowHeight"/> Col nums: <input type="number" v-model="colNum"/>
+                Row Height: <input type="number" v-model="unit"/> Col nums: <input type="number" v-model="colNum"/>
                 Margin x: <input type="number" v-model="marginX"/> Margin y: <input type="number" v-model="marginY"/>
             </div>
             <div style="width: 1000px; height: 720px; overflow: auto; background-color: rgba(23, 23, 112, 0.1);">
@@ -28,8 +28,7 @@
                     :margin="[parseInt(marginX), parseInt(marginY)]"
                         :layout.sync="layout"
                         :col-num="parseInt(colNum)"
-                        :col-width="colWidth"
-                        :row-height="rowHeight"
+                        :unit="unit"
                         :is-draggable="draggable"
                         :is-resizable="resizable"
                         :prevent-collision="preventCollision"
@@ -102,8 +101,7 @@
                 resizable: true,
                 preventCollision: true,
                 compact: true,
-                rowHeight: 40,
-                colWidth: 40,
+                unit: 40,
                 colNum: 12,
                 index: 0,
                 marginX: 10,
