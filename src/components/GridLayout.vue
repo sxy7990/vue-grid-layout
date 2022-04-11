@@ -115,6 +115,12 @@
             self.eventBus = self._provided.eventBus;
             self.eventBus.$on('resizeEvent', self.resizeEventHandler);
             self.eventBus.$on('dragEvent', self.dragEventHandler);
+            
+            for (let i = 0; i < self.layout.length; i++) {
+                const element = self.layout[i];
+                element.realx = element.x
+                element.realy = element.y
+            }
             self.$emit('layout-created', self.layout);
         },
         beforeDestroy: function(){

@@ -12,8 +12,6 @@
             </div>
         </div>
         <div id="content">
-            <button @click="decreaseWidth">Decrease Width</button>
-            <button @click="increaseWidth">Increase Width</button>
             <button @click="addItem">Add an item</button>
             <button @click="addItemDynamically">Add an item dynamically</button>
             <input type="checkbox" v-model="draggable"/> Draggable
@@ -71,14 +69,10 @@
     import CustomDragElement from './components/CustomDragElement.vue';
 
     let testLayout = [
-        {"x":0,"y":0,"w":2,"h":2,"i":"0", resizable: true, draggable: true, static: false},
-        {"x":2,"y":0,"w":2,"h":4,"i":"1", resizable: null, draggable: null, static: true},
-        {"x":4,"y":0,"w":2,"h":5,"i":"2", resizable: false, draggable: false, static: false},
-        {"x":6,"y":0,"w":2,"h":3,"i":"3", resizable: false, draggable: false, static: false},
-        {"x":8,"y":0,"w":2,"h":3,"i":"4", resizable: false, draggable: false, static: false},
-        {"x":10,"y":0,"w":2,"h":3,"i":"5", resizable: false, draggable: false, static: false},
-        {"x":0,"y":5,"w":2,"h":5,"i":"6", resizable: false, draggable: false, static: false},
-        {"x":2,"y":5,"w":2,"h":5,"i":"7", resizable: false, draggable: false, static: false},
+        {"x":0,"y":1,"w":2,"h":2,"i":"0", resizable: true, draggable: true, static: false},
+        {"x":6,"y":0,"w":2,"h":2,"i":"1", resizable: null, draggable: null, static: false},
+        {"x":1,"y":5,"w":2,"h":2,"i":"2", resizable: false, draggable: false, static: false},
+        {"x":8,"y":8,"w":2,"h":2,"i":"3", resizable: false, draggable: false, static: false},
     ];
 
     export default {
@@ -92,7 +86,6 @@
         data () {
             return {
                 layout: JSON.parse(JSON.stringify(testLayout)),
-                layout2: JSON.parse(JSON.stringify(testLayout)),
                 draggable: true,
                 resizable: true,
                 preventCollision: true,
@@ -110,16 +103,6 @@
         methods: {
             clicked: function() {
                 window.alert("CLICK!");
-            },
-            increaseWidth: function() {
-                let width = document.getElementById("content").offsetWidth;
-                width += 20;
-                document.getElementById("content").style.width = width+"px";
-            },
-            decreaseWidth: function() {
-                let width = document.getElementById("content").offsetWidth;
-                width -= 20;
-                document.getElementById("content").style.width = width+"px";
             },
             removeItem: function(i) {
                 console.log("### REMOVE " + i);

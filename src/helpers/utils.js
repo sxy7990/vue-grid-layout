@@ -92,6 +92,7 @@ export function collides(l1: LayoutItem, l2: LayoutItem): boolean {
 }
 
 export function handleNegative(layout: Layout): Layout {
+  console.log('111', layout[0].realx, layout[0].realy);
   const top = handletop(layout);
   const left = handleleft(layout);
   for (let i = 0, len = layout.length; i < len; i++) {
@@ -99,6 +100,7 @@ export function handleNegative(layout: Layout): Layout {
     l.x = l.x + left
     l.y = l.y + top
   }
+  console.log('222', layout[0].realx, layout[0].realy);
   return layout;
 }
 
