@@ -14,7 +14,7 @@ export type Size = {width: number, height: number};
  * @param  {Array} layout Layout array.
  * @return {Number}       Bottom coordinate.
  */
-export function bottom(layout: Layout): number {
+export function handlebottom(layout: Layout): number {
   let max = 0, bottomY;
   for (let i = 0, len = layout.length; i < len; i++) {
     bottomY = layout[i].y + layout[i].h;
@@ -24,17 +24,22 @@ export function bottom(layout: Layout): number {
 }
 
 export function handletop(layout: Layout): number {
-  let max = 0, topY;
+  let min = layout[0].y
+  let topY
   for (let i = 0, len = layout.length; i < len; i++) {
-    if (layout[i].y < 0) {
-      topY = Math.abs(layout[i].y);
+    if (layout[i].y < min) {
+      min = layout[i].y
     }
-    if (topY > max) max = topY;
   }
-  return max;
+  if (min > 0) {
+    topY = -min
+  } else {
+    topY = Math.abs(min)
+  }
+  return topY;
 }
 
-export function right(layout: Layout): number {
+export function handleright(layout: Layout): number {
   let max = 0, rightX;
   for (let i = 0, len = layout.length; i < len; i++) {
     rightX = layout[i].x + layout[i].w;
@@ -44,14 +49,19 @@ export function right(layout: Layout): number {
 }
 
 export function handleleft(layout: Layout): number {
-  let max = 0, leftX;
+  let min = layout[0].x
+  let leftX = min
   for (let i = 0, len = layout.length; i < len; i++) {
-    if (layout[i].x < 0) {
-      leftX = Math.abs(layout[i].x);
+    if (layout[i].x < min) {
+      min = layout[i].x
     }
-    if (leftX > max) max = leftX;
   }
-  return max;
+  if (min > 0) {
+    leftX = -min
+  } else {
+    leftX = Math.abs(min)
+  }
+  return leftX;
 }
 
 export function cloneLayout(layout: Layout): Layout {
@@ -86,12 +96,8 @@ export function handleNegative(layout: Layout): Layout {
   const left = handleleft(layout);
   for (let i = 0, len = layout.length; i < len; i++) {
     const l = layout[i];
-    if (left > 0) {
-      l.x = l.x + left
-    }
-    if (top > 0) {
-      l.y = l.y + top
-    }
+    l.x = l.x + left
+    l.y = l.y + top
   }
   return layout;
 }
@@ -387,7 +393,7 @@ export function setTopLeft(top, left, width, height): Object {
 export function setTopRight(top, right, width, height): Object {
     return {
         top: top + "px",
-        right: right+ "px",
+        right: right + "px",
         width: width + "px",
         height: height + "px",
         position: 'absolute'

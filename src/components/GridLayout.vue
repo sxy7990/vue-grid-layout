@@ -22,7 +22,7 @@
     import Vue from 'vue';
     const elementResizeDetectorMaker = require("element-resize-detector");
 
-    import {bottom, handletop, handleleft, right, compact, handleNegative, getLayoutItem, moveElement, validateLayout, getAllCollisions} from '@/helpers/utils';
+    import {handlebottom, handletop, handleleft, handleright, compact, handleNegative, getLayoutItem, moveElement, validateLayout, getAllCollisions} from '@/helpers/utils';
 
     import GridItem from './GridItem.vue'
     import {addWindowEventListener, removeWindowEventListener} from "@/helpers/DOM";
@@ -146,7 +146,6 @@
 
                     self.$emit('layout-updated', self.layout)
                     handleNegative(this.layout)
-
                     self.updatePlayground();
                     self.$nextTick(function () {
                         this.erd = elementResizeDetectorMaker({
@@ -235,9 +234,9 @@
 
                     compact(this.layout, this.verticalCompact);
                     this.updatePlayground();
+                    handleNegative(this.layout)
 
                     this.$emit('layout-updated', this.layout)
-                    handleNegative(this.layout)
                 }
             },
             updatePlayground: function () {
@@ -254,12 +253,12 @@
             },
             containerWidth: function () {
                 if (!this.autoSize) return;
-                const containerWidth = handleleft(this.layout) * this.unit + right(this.layout) * this.unit + 'px';
+                const containerWidth = handleleft(this.layout) * this.unit + handleright(this.layout) * this.unit + 'px';
                 return containerWidth;
             },
             containerHeight: function () {
                 if (!this.autoSize) return;
-                const containerHeight = handletop(this.layout) * this.unit + bottom(this.layout) * this.unit + 'px';
+                const containerHeight = handletop(this.layout) * this.unit + handlebottom(this.layout) * this.unit + 'px';
                 return containerHeight;
             },
             dragEvent: function (eventName, id, x, y, h, w) {
@@ -291,8 +290,8 @@
                 this.eventBus.$emit("compact");
                 this.updatePlayground();
                 if (eventName === 'dragend') {
-                    this.$emit('layout-updated', this.layout);
                     handleNegative(this.layout)
+                    this.$emit('layout-updated', this.layout);
                 }
             },
             resizeEvent: function (eventName, id, x, y, h, w) {
@@ -351,8 +350,8 @@
                 this.updatePlayground();
 
                 if (eventName === 'resizeend') {
-                    this.$emit('layout-updated', this.layout);
                     handleNegative(this.layout)
+                    this.$emit('layout-updated', this.layout);
                 }
             },
 
