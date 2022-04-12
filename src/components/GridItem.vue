@@ -96,7 +96,7 @@
         inject: ["eventBus", "layout"],
         data: function () {
             return {
-                containerWidth: 100,
+                // containerWidth: 100,
                 unit: 40,
                 maxRows: Infinity,
                 maxCols: Infinity,
@@ -177,7 +177,7 @@
         },
         mounted: function () {
             this.unit = this.layout.unit;
-            this.containerWidth = this.layout.width !== null ? this.layout.width : 100;
+            // this.containerWidth = this.layout.width !== null ? this.layout.width : 100;
             this.maxRows = this.layout.maxRows;
 
             if (this.isDraggable === null) {
@@ -215,11 +215,11 @@
                 this.createStyle();
                 this.emitContainerResized();
             },
-            containerWidth: function () {
-                this.tryMakeResizable();
-                this.createStyle();
-                this.emitContainerResized();
-            },
+            // containerWidth: function () {
+            //     this.tryMakeResizable();
+            //     this.createStyle();
+            //     this.emitContainerResized();
+            // },
             x: function (newVal) {
                 this.innerX = newVal;
                 this.createStyle();
@@ -279,6 +279,9 @@
                 this.innerX = this.x;
                 this.innerW = this.w;
                 let pos = this.calcPosition(this.innerX, this.innerY, this.innerW, this.innerH);
+
+                // const offsetX = this.layout.layout[0].offsetX || 0
+                // const offsetY = this.layout.layout[0].offsetY || 0
 
 
                 if (this.isDragging) {

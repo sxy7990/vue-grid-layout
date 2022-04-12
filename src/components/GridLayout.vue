@@ -118,8 +118,8 @@
             
             for (let i = 0; i < self.layout.length; i++) {
                 const element = self.layout[i];
-                element.realx = element.x
-                element.realy = element.y
+                element.offsetX = 0
+                element.offsetY = 0
             }
             self.$emit('layout-created', self.layout);
         },
@@ -149,10 +149,9 @@
                     addWindowEventListener('resize', self.onWindowResize);
 
                     compact(self.layout, self.verticalCompact);
-
-                    self.$emit('layout-updated', self.layout)
                     handleNegative(this.layout)
                     self.updatePlayground();
+                    self.$emit('layout-updated', self.layout)
                     self.$nextTick(function () {
                         this.erd = elementResizeDetectorMaker({
                             strategy: "scroll", //<- For ultra performance.
@@ -241,7 +240,6 @@
                     compact(this.layout, this.verticalCompact);
                     this.updatePlayground();
                     handleNegative(this.layout)
-
                     this.$emit('layout-updated', this.layout)
                 }
             },
